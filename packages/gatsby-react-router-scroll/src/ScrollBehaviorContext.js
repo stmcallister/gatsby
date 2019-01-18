@@ -27,6 +27,7 @@ class ScrollContext extends React.Component {
     })
 
     this.scrollBehavior.updateScroll(null, this.getRouterProps())
+    this.hasMountedOnce = false
   }
 
   getChildContext() {
@@ -58,6 +59,22 @@ class ScrollContext extends React.Component {
     }
 
     this.scrollBehavior.updateScroll(prevRouterProps, { history, location })
+  }
+
+  /**
+   * scrollBehavior sets history.scrollRestoration to "manual" which means we have to take care of scrolling ourselves for pages.
+   * It works great in a client side SPA as the browser can't jump to the correct content because it's not there.
+   * Gatsby can because it's awesome (ships SSR html too) so we don't want to disable scrollRestoration when people refresh or close the tab
+   * see #7454
+   */
+  componentDidMount(props) {
+    if (!this.hasMountedOnce) {
+      this.hasMountedOnce = true
+
+      window.addEventListener(`beforeunload`, () => {
+        this.scrollBehavior.stop()
+      })
+    }
   }
 
   componentWillUnmount() {
