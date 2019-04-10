@@ -5,7 +5,7 @@ import redirects from "./redirects.json"
 import { apiRunner } from "./api-runner-browser"
 import emitter from "./emitter"
 import { navigate as reachNavigate } from "@reach/router"
-import parsePath from "./parse-path"
+import { parsePath } from "gatsby-link"
 
 // Convert to a map for faster lookup in maybeRedirect()
 const redirectMap = redirects.reduce((map, redirect) => {
@@ -67,10 +67,7 @@ const navigate = (to, options = {}) => {
 
   // If we had a service worker update, no matter the path, reload window and
   // reset the pathname whitelist
-  if (window.GATSBY_SW_UPDATED) {
-    const { controller } = navigator.serviceWorker
-    controller.postMessage({ gatsbyApi: `resetWhitelist` })
-
+  if (window.___swUpdated) {
     window.location = pathname
     return
   }
